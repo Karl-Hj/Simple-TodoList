@@ -1,6 +1,7 @@
 import { createContext, useEffect, useReducer, useState } from "react";
 import { TodoForm } from "./TodoForm";
 import { TodoList } from "./TodoList";
+import { FilterTodoList } from "./FilterTodoList";
 
 const INITAL_KEY_VALUE = "Todo";
 const ACTIONS = {
@@ -32,7 +33,9 @@ function reducer(todos, { type, payload }) {
 }
 
 function App() {
+  const [filterName, setFilterName] = useState("");
   const [newTodo, setNewTodo] = useState("");
+
   const [count, setCount] = useState(() => {
     const localCount = localStorage.getItem("Count");
     return localCount ? parseInt(localCount) : 0;
@@ -44,6 +47,10 @@ function App() {
     } else {
       return JSON.parse(localValue);
     }
+  });
+
+  const filteredTodos = todos.filter((todo) => {
+    return todo.name.includes(filterName);
   });
 
   useEffect(() => {
@@ -79,8 +86,15 @@ function App() {
   return (
     <>
       <TodoContext.Provider
-        value={{ addTodo, count, toggleTodo, deleteTodo, todos }}
+        value={{
+          addTodo,
+          count,
+          toggleTodo,
+          deleteTodo,
+          todos: filteredTodos,
+        }}
       >
+        <FilterTodoList name={filterName} setFilterName={setFilterName} />
         <TodoList />
         <TodoForm newTodo={newTodo} setNewTodo={setNewTodo} />
       </TodoContext.Provider>
